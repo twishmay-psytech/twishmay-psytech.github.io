@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Twishmay Shankar</title>
+<meta name="description" content="Research at the intersection of statistical mechanics, active inference, and agent design.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #06080d;
+  --surface: #0d1117;
+  --surface2: #161b22;
+  --border: #21262d;
+  --border-hl: #30363d;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --text-muted: #484f58;
+  --accent: #58a6ff;
+  --accent2: #bc8cff;
+  --accent3: #ff7b72;
+  --accent4: #3fb950;
+  --accent5: #f0883e;
+  --accent6: #f778ba;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg); color: var(--text);
+  line-height: 1.6; overflow-x: hidden;
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+a { color: var(--accent); text-decoration: none; transition: all 0.25s; }
+a:hover { color: var(--accent2); }
+::selection { background: var(--accent); color: var(--bg); }
+
+/* Canvas */
+#bg-canvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none; opacity: 0.3;
+}
+
+/* Layout */
+.page { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; }
+.container { max-width: 900px; margin: 0 auto; padding: 0 2rem; width: 100%; }
+
+/* Hero */
+.hero {
+  padding: 8rem 0 4rem; text-align: center;
+}
+.avatar {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent6));
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 2.5rem; font-weight: 800; color: var(--bg);
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 40px rgba(88,166,255,0.2);
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800;
+  letter-spacing: -0.03em; margin-bottom: 0.75rem;
+}
+.hero h1 span {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero .bio {
+  font-size: 1.15rem; color: var(--text-dim); max-width: 600px;
+  margin: 0 auto 2rem; line-height: 1.7;
+}
+.hero-links {
+  display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;
+}
+.hero-links a {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 1.1rem; border-radius: 8px;
+  font-size: 0.85rem; font-weight: 500;
+  border: 1px solid var(--border); color: var(--text-dim);
+  transition: all 0.25s;
+}
+.hero-links a:hover {
+  border-color: var(--accent); color: var(--text);
+  background: rgba(88,166,255,0.06);
+}
+.hero-links a svg { width: 16px; height: 16px; }
+
+/* Section */
+section { padding: 3rem 0; }
+.section-label {
+  font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--accent); margin-bottom: 0.5rem;
+}
+section h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+
+/* Project cards */
+.projects { display: flex; flex-direction: column; gap: 1rem; }
+.project-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.75rem; transition: all 0.3s;
+  position: relative; overflow: hidden;
+  display: grid; grid-template-columns: 1fr auto; gap: 1.5rem; align-items: start;
+}
+.project-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  opacity: 0; transition: opacity 0.3s;
+}
+.project-card:hover { border-color: var(--border-hl); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+.project-card:hover::before { opacity: 1; }
+.project-card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.project-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent3), var(--accent5)); }
+.project-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent4), var(--accent)); }
+
+.project-card h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.4rem; }
+.project-card h3 a { color: var(--text); }
+.project-card h3 a:hover { color: var(--accent); }
+.project-card .project-desc { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 0.75rem; line-height: 1.6; }
+.project-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.project-stat {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+  color: var(--text-muted); background: var(--surface2);
+  padding: 0.2rem 0.55rem; border-radius: 5px;
+}
+.project-stat .dot { width: 7px; height: 7px; border-radius: 50%; }
+.project-badge {
+  font-size: 0.72rem; padding: 0.2rem 0.6rem; border-radius: 5px;
+  font-weight: 600; letter-spacing: 0.03em;
+}
+.badge-live { background: rgba(63,185,80,0.12); color: var(--accent4); border: 1px solid rgba(63,185,80,0.25); }
+.badge-wip { background: rgba(240,136,62,0.12); color: var(--accent5); border: 1px solid rgba(240,136,62,0.25); }
+
+.project-arrow {
+  color: var(--text-muted); transition: all 0.25s; align-self: center;
+}
+.project-card:hover .project-arrow { color: var(--accent); transform: translateX(4px); }
+
+/* Research themes */
+.themes-strip {
+  display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 2rem 0;
+}
+.theme-pill {
+  font-size: 0.78rem; padding: 0.3rem 0.7rem; border-radius: 6px;
+  border: 1px solid var(--border); color: var(--text-dim);
+  transition: all 0.2s;
+}
+.theme-pill:hover { border-color: var(--accent); color: var(--text); background: rgba(88,166,255,0.05); }
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border); padding: 2rem;
+  text-align: center; color: var(--text-muted); font-size: 0.8rem;
+  position: relative; z-index: 1;
+}
+
+/* Animations */
+.fade-in { opacity: 0; transform: translateY(20px); animation: fadeIn 0.7s ease-out forwards; }
+.fade-in:nth-child(1) { animation-delay: 0s; }
+.fade-in:nth-child(2) { animation-delay: 0.1s; }
+.fade-in:nth-child(3) { animation-delay: 0.2s; }
+.fade-in:nth-child(4) { animation-delay: 0.3s; }
+@keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 640px) {
+  .hero { padding: 5rem 0 3rem; }
+  .project-card { grid-template-columns: 1fr; }
+  .project-arrow { display: none; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="page">
+<div class="container">
+
+<!-- HERO -->
+<div class="hero fade-in">
+  <div class="avatar">TS</div>
+  <h1>Twishmay <span>Shankar</span></h1>
+  <p class="bio">Building formal frameworks at the intersection of statistical mechanics, active inference, and autonomous agent design. Exploring how possibility spaces unify physics, signals, and intelligence.</p>
+  <div class="hero-links">
+    <a href="https://github.com/twishmay-psytech">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      GitHub
+    </a>
+    <a href="https://twishmay-psytech.github.io/possibility-space-theory/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Research Portal
+    </a>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<section class="fade-in">
+  <div class="section-label">Projects</div>
+  <h2>Research &amp; Open Source</h2>
+  <div class="projects">
+
+    <a href="https://twishmay-psytech.github.io/possibility-space-theory/" class="project-card" style="text-decoration:none;color:inherit;">
+      <div>
+        <h3><span style="color:var(--text)">Possibility Space Theory</span></h3>
+        <p class="project-desc">A 36-paper research program unifying statistical mechanics, active inference, and agent design through one formal language. 6 clusters spanning foundations, thermodynamics, signals, inference, AGI benchmarks, and applied systems.</p>
+        <div class="project-meta">
+          <span class="project-stat"><span class="dot" style="background:var(--accent)"></span> 36 papers</span>
+          <span class="project-stat"><span class="dot" style="background:var(--accent2)"></span> 6 clusters</span>
+          <span class="project-stat"><span class="dot" style="background:var(--accent6)"></span> 1,878 files</span>
+          <span class="project-badge badge-live">LIVE</span>
+        </div>
+      </div>
+      <svg class="project-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+
+    <div class="project-card">
+      <div>
+        <h3>KHAOS / KPL</h3>
+        <p class="project-desc">A model of computation for meaning-native programming. Meaning addresses, stored programs, and the AGI infrastructure thesis — the computational substrate underlying possibility spaces.</p>
+        <div class="project-meta">
+          <span class="project-stat"><span class="dot" style="background:var(--accent3)"></span> 6 working papers</span>
+          <span class="project-stat"><span class="dot" style="background:var(--accent5)"></span> formal language</span>
+          <span class="project-badge badge-wip">IN PROGRESS</span>
+        </div>
+      </div>
+      <svg class="project-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </div>
+
+    <div class="project-card">
+      <div>
+        <h3>Autonomous Research Pipeline</h3>
+        <p class="project-desc">Training data infrastructure for teaching models to do autonomous research. Structured task traces, source-target pairs, and evaluation schemas for fine-tuning and RLHF.</p>
+        <div class="project-meta">
+          <span class="project-stat"><span class="dot" style="background:var(--accent4)"></span> JSON schemas</span>
+          <span class="project-stat"><span class="dot" style="background:var(--accent)"></span> training pipeline</span>
+          <span class="project-badge badge-wip">IN PROGRESS</span>
+        </div>
+      </div>
+      <svg class="project-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </div>
+
+  </div>
+</section>
+
+<!-- THEMES -->
+<section class="fade-in">
+  <div class="section-label">Domains</div>
+  <h2>Research Themes</h2>
+  <div class="themes-strip">
+    <span class="theme-pill">possibility spaces</span>
+    <span class="theme-pill">ergodic theory</span>
+    <span class="theme-pill">free energy principle</span>
+    <span class="theme-pill">active inference</span>
+    <span class="theme-pill">Bayesian inference</span>
+    <span class="theme-pill">dynamical systems</span>
+    <span class="theme-pill">state space models</span>
+    <span class="theme-pill">information geometry</span>
+    <span class="theme-pill">phase transitions</span>
+    <span class="theme-pill">emergence</span>
+    <span class="theme-pill">entropy &amp; complexity</span>
+    <span class="theme-pill">cellular automata</span>
+    <span class="theme-pill">formal languages</span>
+    <span class="theme-pill">digital twins</span>
+    <span class="theme-pill">world models</span>
+    <span class="theme-pill">variational methods</span>
+    <span class="theme-pill">Markov blankets</span>
+    <span class="theme-pill">thermodynamic computing</span>
+    <span class="theme-pill">ARC-AGI</span>
+    <span class="theme-pill">autonomous agents</span>
+  </div>
+</section>
+
+</div>
+</div>
+
+<footer>
+  <div class="container">
+    Twishmay Shankar &middot; Research &amp; Open Source &middot; <a href="https://github.com/twishmay-psytech">github.com/twishmay-psytech</a>
+  </div>
+</footer>
+
+<script>
+// Particle background (same style as PST portal)
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+const colors = ['#58a6ff','#bc8cff','#ff7b72','#3fb950','#f0883e','#f778ba'];
+let nodes = [];
+
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+
+for (let i = 0; i < 45; i++) {
+  nodes.push({
+    x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+    vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3,
+    r: Math.random()*1.8+0.8, color: colors[Math.floor(Math.random()*6)]
+  });
+}
+
+function animate() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  nodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x<0||n.x>canvas.width) n.vx*=-1;
+    if (n.y<0||n.y>canvas.height) n.vy*=-1;
+  });
+  for (let i=0;i<nodes.length;i++) {
+    for (let j=i+1;j<nodes.length;j++) {
+      const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if (dist<140) {
+        ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y);
+        ctx.strokeStyle=`rgba(88,166,255,${0.1*(1-dist/140)})`; ctx.lineWidth=0.5; ctx.stroke();
+      }
+    }
+  }
+  nodes.forEach(n => {
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+    ctx.fillStyle=n.color; ctx.globalAlpha=0.5; ctx.fill(); ctx.globalAlpha=1;
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
